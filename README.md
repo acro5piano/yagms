@@ -1,2 +1,3 @@
 # yagms
-yet another gmail mcp server
+
+Yet Another Gmail MCP Server
