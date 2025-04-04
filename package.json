@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "build-weather": "bun build src/weather.ts --outdir ./dist --target node",
+    "build-gmail": "bun build src/gmail.ts --outdir ./dist --target node",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
