@@ -8,6 +8,7 @@ import fs from 'fs'
 import { google } from 'googleapis'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import os from 'os'
 
 const gmail = google.gmail('v1')
 
@@ -375,8 +376,8 @@ server.tool('get-labels', 'Get all Gmail labels', {}, async () => {
 const credentialsPath =
   process.env.GMAIL_CREDENTIALS_PATH ||
   path.join(
-    path.dirname(fileURLToPath(import.meta.url)),
-    '../../../.gmail-server-credentials.json',
+    os.homedir(),
+    '.yagms-credentials.json',
   )
 
 async function authenticateAndSaveCredentials() {
@@ -385,8 +386,8 @@ async function authenticateAndSaveCredentials() {
     keyfilePath:
       process.env.GMAIL_OAUTH_PATH ||
       path.join(
-        path.dirname(fileURLToPath(import.meta.url)),
-        '../../../gcp-oauth.keys.json',
+        os.homedir(),
+        '.yagms-oauth.keys.json',
       ),
     scopes: [
       'https://www.googleapis.com/auth/gmail.readonly',
