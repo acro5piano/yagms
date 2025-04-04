@@ -1,6 +1,10 @@
 {
   "name": "yagms",
   "private": true,
+  "scripts": {
+    "build-weather": "bun build src/weather.ts --outdir ./dist --target node",
+    "typecheck": "tsc --noEmit"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
