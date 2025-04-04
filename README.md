@@ -19,14 +19,12 @@ The Gmail MCP server provides tools to interact with your Gmail account through 
 
 ### Build this project
 
-Install Bun.
+1. Install Bun.
+2. Build the code
 
 ```bash
-# Run the authentication flow
 bun install
-bun run build-gmail
-
-# It will emit dist/gmail.js
+bun run build-gmail # It will emit ./dist/gmail.js
 ```
 
 #### Authentication
@@ -39,6 +37,7 @@ bun run dist/gmail.js auth
 ```
 
 This will:
+
 - Launch a browser window for you to sign in to your Google account
 - Request permission to access your Gmail account
 - Save the authentication credentials to `~/.yagms-credentials.json`
@@ -64,16 +63,19 @@ You can customize the paths for OAuth keys and credentials using environment var
 The Gmail MCP server provides the following tools:
 
 1. **list-emails**: Get emails from your inbox
+
    - Parameters:
      - `senderEmail` (optional): Filter by sender email
      - `maxResults` (optional, default: 10): Maximum number of emails to return
      - `labelIds` (optional, default: ["INBOX"]): Label IDs to filter by
 
 2. **get-email**: Get a specific email by ID
+
    - Parameters:
      - `emailId`: The ID of the email to retrieve
 
 3. **search-emails**: Search for emails using Gmail search syntax
+
    - Parameters:
      - `query`: Gmail search query (e.g., "from:example@gmail.com has:attachment")
      - `maxResults` (optional, default: 10): Maximum number of emails to return
