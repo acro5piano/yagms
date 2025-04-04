@@ -205,63 +205,63 @@ server.tool(
   },
 )
 
-server.tool(
-  'send-email',
-  'Send an email',
-  {
-    to: z.string().email().describe('Recipient email address'),
-    subject: z.string().describe('Email subject'),
-    body: z.string().describe('Email body content (plain text)'),
-    cc: z.string().email().optional().describe('CC recipient email address'),
-    bcc: z.string().email().optional().describe('BCC recipient email address'),
-  },
-  async ({ to, subject, body, cc, bcc }) => {
-    try {
-      // Construct email content
-      const emailLines = []
-      emailLines.push(`To: ${to}`)
-      if (cc) emailLines.push(`Cc: ${cc}`)
-      if (bcc) emailLines.push(`Bcc: ${bcc}`)
-      emailLines.push(`Subject: ${subject}`)
-      emailLines.push('Content-Type: text/plain; charset=utf-8')
-      emailLines.push('')
-      emailLines.push(body)
-
-      const email = emailLines.join('\r\n')
-      const encodedEmail = Buffer.from(email)
-        .toString('base64')
-        .replace(/\+/g, '-')
-        .replace(/\//g, '_')
-        .replace(/=+$/, '')
-
-      const response = await gmail.users.messages.send({
-        userId: 'me',
-        requestBody: {
-          raw: encodedEmail,
-        },
-      })
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Email sent successfully. Message ID: ${response.data.id}`,
-          },
-        ],
-      }
-    } catch (error: any) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error sending email: ${error.message}`,
-          },
-        ],
-        isError: true,
-      }
-    }
-  },
-)
+// server.tool(
+//   'send-email',
+//   'Send an email',
+//   {
+//     to: z.string().email().describe('Recipient email address'),
+//     subject: z.string().describe('Email subject'),
+//     body: z.string().describe('Email body content (plain text)'),
+//     cc: z.string().email().optional().describe('CC recipient email address'),
+//     bcc: z.string().email().optional().describe('BCC recipient email address'),
+//   },
+//   async ({ to, subject, body, cc, bcc }) => {
+//     try {
+//       // Construct email content
+//       const emailLines = []
+//       emailLines.push(`To: ${to}`)
+//       if (cc) emailLines.push(`Cc: ${cc}`)
+//       if (bcc) emailLines.push(`Bcc: ${bcc}`)
+//       emailLines.push(`Subject: ${subject}`)
+//       emailLines.push('Content-Type: text/plain; charset=utf-8')
+//       emailLines.push('')
+//       emailLines.push(body)
+//
+//       const email = emailLines.join('\r\n')
+//       const encodedEmail = Buffer.from(email)
+//         .toString('base64')
+//         .replace(/\+/g, '-')
+//         .replace(/\//g, '_')
+//         .replace(/=+$/, '')
+//
+//       const response = await gmail.users.messages.send({
+//         userId: 'me',
+//         requestBody: {
+//           raw: encodedEmail,
+//         },
+//       })
+//
+//       return {
+//         content: [
+//           {
+//             type: 'text',
+//             text: `Email sent successfully. Message ID: ${response.data.id}`,
+//           },
+//         ],
+//       }
+//     } catch (error: any) {
+//       return {
+//         content: [
+//           {
+//             type: 'text',
+//             text: `Error sending email: ${error.message}`,
+//           },
+//         ],
+//         isError: true,
+//       }
+//     }
+//   },
+// )
 
 server.tool(
   'search-emails',
@@ -373,8 +373,8 @@ async function authenticateAndSaveCredentials() {
       path.join(os.homedir(), '.yagms-oauth.keys.json'),
     scopes: [
       'https://www.googleapis.com/auth/gmail.readonly',
-      'https://www.googleapis.com/auth/gmail.send',
       'https://www.googleapis.com/auth/gmail.labels',
+      // 'https://www.googleapis.com/auth/gmail.send',
     ],
   })
   fs.writeFileSync(credentialsPath, JSON.stringify(auth.credentials))
