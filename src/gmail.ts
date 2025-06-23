@@ -381,6 +381,19 @@ async function authenticateAndSaveCredentials() {
   console.log('Credentials saved. You can now run the server.')
 }
 
+async function refreshAccessToken(auth: any, credentials: any) {
+  try {
+    const { credentials: newCredentials } = await auth.refreshAccessToken()
+    const updatedCredentials = { ...credentials, ...newCredentials }
+    fs.writeFileSync(credentialsPath, JSON.stringify(updatedCredentials))
+    console.error('Access token refreshed and saved.')
+    return updatedCredentials
+  } catch (error: any) {
+    console.error('Failed to refresh access token:', error.message)
+    throw error
+  }
+}
+
 async function loadCredentialsAndRunServer() {
   if (!fs.existsSync(credentialsPath)) {
     console.error(
@@ -389,9 +402,48 @@ async function loadCredentialsAndRunServer() {
     process.exit(1)
   }
 
-  const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf-8'))
-  const auth = new google.auth.OAuth2()
+  const oauthKeysPath = process.env.GMAIL_OAUTH_PATH ||
+    path.join(os.homedir(), '.yagms-oauth.keys.json')
+  
+  if (!fs.existsSync(oauthKeysPath)) {
+    console.error(
+      "OAuth keys not found. Please ensure .yagms-oauth.keys.json exists.",
+    )
+    process.exit(1)
+  }
+
+  const oauthKeys = JSON.parse(fs.readFileSync(oauthKeysPath, 'utf-8'))
+  let credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf-8'))
+  
+  const auth = new google.auth.OAuth2(
+    oauthKeys.installed.client_id,
+    oauthKeys.installed.client_secret,
+    oauthKeys.installed.redirect_uris[0]
+  )
   auth.setCredentials(credentials)
+
+  // Set up automatic token refresh
+  auth.on('tokens', (tokens: any) => {
+    if (tokens.refresh_token) {
+      credentials.refresh_token = tokens.refresh_token
+    }
+    if (tokens.access_token) {
+      credentials.access_token = tokens.access_token
+    }
+    if (tokens.expiry_date) {
+      credentials.expiry_date = tokens.expiry_date
+    }
+    fs.writeFileSync(credentialsPath, JSON.stringify(credentials))
+    console.error('Tokens updated and saved.')
+  })
+
+  // Check if token needs refresh before starting
+  if (credentials.expiry_date && Date.now() >= credentials.expiry_date) {
+    console.error('Access token expired, refreshing...')
+    credentials = await refreshAccessToken(auth, credentials)
+    auth.setCredentials(credentials)
+  }
+
   google.options({ auth })
 
   console.error('Credentials loaded. Starting server.')
